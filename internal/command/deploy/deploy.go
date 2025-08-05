@@ -3,6 +3,7 @@ package deploy
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -384,6 +385,9 @@ func DeployWithConfig(ctx context.Context, appConfig *appconfig.Config, userID i
 	}
 
 	fmt.Fprintf(io.Out, "\nWatch your deployment at https://fly.io/apps/%s/monitoring\n\n", appName)
+	if flusher, ok := io.Out.(http.Flusher); ok {
+		flusher.Flush()
+	}
 	if err := deployToMachines(ctx, appConfig, appCompact, img); err != nil {
 		return err
 	}
@@ -399,6 +403,9 @@ func DeployWithConfig(ctx context.Context, appConfig *appconfig.Config, userID i
 		fmt.Fprintf(io.Out, "\nYour your newly deployed app is available in the organizations' private network under http://%s.flycast\n", appName)
 	} else if ip == "none" {
 		fmt.Fprintf(io.Out, "\nYour app is deployed but does not have a public or private IP address\n")
+	}
+	if flusher, ok := io.Out.(http.Flusher); ok {
+		flusher.Flush()
 	}
 
 	return err

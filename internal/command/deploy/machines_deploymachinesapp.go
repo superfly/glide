@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 	"net"
+	"net/http"
 	"slices"
 	"strconv"
 	"strings"
@@ -1354,6 +1355,9 @@ func (md *machineDeployment) checkDNS(ctx context.Context) error {
 	if appURL := md.appConfig.URL(); appURL != nil && len(ipAddrs) > 0 {
 		iostreams := iostreams.FromContext(ctx)
 		fmt.Fprintf(iostreams.ErrOut, "Checking DNS configuration for %s\n", md.colorize.Bold(appURL.Host))
+		if flusher, ok := iostreams.ErrOut.(http.Flusher); ok {
+			flusher.Flush()
+		}
 
 		fqdn := dns.Fqdn(appURL.Host)
 		c := dns.Client{

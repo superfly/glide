@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/superfly/fly-go/flaps"
 	"github.com/superfly/flyctl/internal/appconfig"
@@ -67,7 +68,11 @@ func deployApp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx = task.NewWithContext(ctx)
-	ctx = iostreams.NewContext(ctx, iostreams.System())
+	ctx = iostreams.NewContext(ctx, &iostreams.IOStreams{
+		In:     os.Stdin,
+		Out:    w,
+		ErrOut: w,
+	})
 
 	// Instantiate FLAPS client if we haven't initialized one via a unit test.
 	if flapsutil.ClientFromContext(ctx) == nil {
