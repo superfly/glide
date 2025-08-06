@@ -2,6 +2,7 @@ package statuslogger
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 	"sync"
 
@@ -48,6 +49,9 @@ func (line *noninteractiveLine) println(s string) {
 	line.logger.mu.Lock()
 	defer line.logger.mu.Unlock()
 	fmt.Fprintln(line.logger.io.Out, s)
+	if flusher, ok := line.logger.io.Out.(http.Flusher); ok {
+		flusher.Flush()
+	}
 }
 
 func (line *noninteractiveLine) Logf(format string, args ...interface{}) {

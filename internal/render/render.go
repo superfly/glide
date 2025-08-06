@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/logrusorgru/aurora"
 	"github.com/morikuni/aec"
@@ -138,6 +139,9 @@ func (tb *TextBlock) Print(v ...interface{}) {
 
 func (tb *TextBlock) Println(v ...interface{}) {
 	fmt.Fprintln(tb.out, v...)
+	if flusher, ok := tb.out.(http.Flusher); ok {
+		flusher.Flush()
+	}
 }
 
 func (tb *TextBlock) Printf(format string, v ...interface{}) {

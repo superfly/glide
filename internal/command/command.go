@@ -57,8 +57,8 @@ func New(usage, short, long string, fn Runner, p ...preparers.Preparer) *cobra.C
 // I don't like this, but it's shippable until someone else fixes it
 var commonPreparers = []preparers.Preparer{
 	preparers.ApplyAliases,
-	determineHostname,
-	determineWorkingDir,
+	DetermineHostname,
+	DetermineWorkingDir,
 	preparers.DetermineConfigDir,
 	ensureConfigDirExists,
 	ensureConfigDirPerms,
@@ -173,7 +173,7 @@ func finalize(ctx context.Context) {
 	}
 }
 
-func determineHostname(ctx context.Context) (context.Context, error) {
+func DetermineHostname(ctx context.Context) (context.Context, error) {
 	h, err := os.Hostname()
 	if err != nil {
 		return nil, fmt.Errorf("failed determining hostname: %w", err)
@@ -185,7 +185,7 @@ func determineHostname(ctx context.Context) (context.Context, error) {
 	return state.WithHostname(ctx, h), nil
 }
 
-func determineWorkingDir(ctx context.Context) (context.Context, error) {
+func DetermineWorkingDir(ctx context.Context) (context.Context, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, fmt.Errorf("failed determining working directory: %w", err)

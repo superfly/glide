@@ -3,6 +3,7 @@ package imgsrc
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/superfly/fly-go"
@@ -28,6 +29,9 @@ func (s *remoteImageResolver) Run(ctx context.Context, _ *dockerClientFactory, s
 	defer span.End()
 
 	fmt.Fprintf(streams.ErrOut, "Searching for image '%s' remotely...\n", opts.ImageRef)
+	if flusher, ok := streams.ErrOut.(http.Flusher); ok {
+		flusher.Flush()
+	}
 
 	build.BuildStart()
 	img, err := s.flyApi.ResolveImageForApp(ctx, opts.AppName, opts.ImageRef)
@@ -42,6 +46,9 @@ func (s *remoteImageResolver) Run(ctx context.Context, _ *dockerClientFactory, s
 	}
 
 	fmt.Fprintf(streams.ErrOut, "image found: %s\n", img.ID)
+	if flusher, ok := streams.ErrOut.(http.Flusher); ok {
+		flusher.Flush()
+	}
 
 	size, err := strconv.ParseUint(img.CompressedSize, 10, 64)
 	if err != nil {
